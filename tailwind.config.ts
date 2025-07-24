@@ -61,7 +61,30 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				schedule: {
+					cell: 'hsl(var(--schedule-cell))',
+					'cell-hover': 'hsl(var(--schedule-cell-hover))',
+					'cell-selected': 'hsl(var(--schedule-cell-selected))',
+					border: 'hsl(var(--schedule-border))',
+					header: 'hsl(var(--schedule-header))'
+				},
+				tag: {
+					blue: 'hsl(var(--tag-blue))',
+					purple: 'hsl(var(--tag-purple))',
+					orange: 'hsl(var(--tag-orange))',
+					pink: 'hsl(var(--tag-pink))',
+					yellow: 'hsl(var(--tag-yellow))',
+					red: 'hsl(var(--tag-red))'
 				}
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-dark': 'var(--gradient-dark)'
+			},
+			boxShadow: {
+				'card': 'var(--shadow-card)',
+				'elevated': 'var(--shadow-elevated)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
