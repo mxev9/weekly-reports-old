@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # ✨ مهم عشان يقدر ينشئ الفرع gh-pages
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -29,3 +32,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          publish_branch: gh-pages  # ✨ يضمن إنشاء الفرع
