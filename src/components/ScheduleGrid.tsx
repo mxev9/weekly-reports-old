@@ -23,6 +23,21 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
     return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
   };
 
+  const getTimelineIcon = (hour: number) => {
+    if (hour === 0) return '🌙';
+    if (hour >= 6 && hour < 12) return '🌅';
+    if (hour === 12) return '☀️';
+    if (hour > 12 && hour < 18) return '🌞';
+    if (hour >= 18 && hour < 24) return '🌙';
+    return '🌙';
+  };
+
+  const getTimelinePosition = (hour: number) => {
+    // Create a smooth transition from top (midnight) to middle (noon) to bottom (midnight)
+    const normalizedHour = hour / 24 * 100;
+    return normalizedHour;
+  };
+
   return (
     <div className="bg-card rounded-xl border border-schedule-border shadow-card overflow-hidden">
       <div className={`overflow-x-auto ${isRTL ? 'rtl' : ''}`}>
@@ -48,8 +63,23 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
           <tbody>
             {hours.map((hour) => (
               <tr key={hour} className="border-b border-schedule-border hover:bg-schedule-cell-hover/50">
-                <td className="sticky left-0 z-10 bg-schedule-header border-r border-schedule-border p-2 text-xs text-muted-foreground font-mono">
-                  {formatHour(hour)}
+                <td className="sticky left-0 z-10 bg-schedule-header border-r border-schedule-border p-0 relative">
+                  <div className="flex items-center h-12 sm:h-16">
+                    {/* Timeline gradient trim */}
+                    <div className="w-1 h-full bg-gradient-to-b from-primary/20 via-primary to-primary/20 relative">
+                      <div 
+                        className="absolute w-3 h-3 -left-1 transform -translate-y-1/2 bg-primary rounded-full flex items-center justify-center text-xs"
+                        style={{ top: `${getTimelinePosition(hour)}%` }}
+                      >
+                        <span className="text-xs">{getTimelineIcon(hour)}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Time text */}
+                    <div className="flex-1 px-2 text-xs text-muted-foreground font-mono">
+                      {formatHour(hour)}
+                    </div>
+                  </div>
                 </td>
                 {displayDays.map((dayIndex) => (
                   <td key={`${dayIndex}-${hour}`} className="border-r border-schedule-border p-0">
