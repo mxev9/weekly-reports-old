@@ -35,18 +35,9 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
     return midnightIcon;
   };
 
-  const getTimelineGradient = (hour: number) => {
-    if (hour >= 0 && hour < 6) return 'from-slate-900 via-blue-900 to-slate-900'; // Night
-    if (hour >= 6 && hour < 12) return 'from-orange-400 via-pink-400 to-yellow-300'; // Sunrise
-    if (hour >= 12 && hour < 18) return 'from-blue-400 via-cyan-300 to-blue-500'; // Day
-    if (hour >= 18 && hour < 24) return 'from-purple-600 via-orange-500 to-red-400'; // Sunset
-    return 'from-slate-900 via-blue-900 to-slate-900';
-  };
-
   const getTimelinePosition = (hour: number) => {
-    // Create a smooth transition from top (midnight) to middle (noon) to bottom (midnight)
-    const normalizedHour = hour / 24 * 100;
-    return normalizedHour;
+    // Position based on hour (0-24) as percentage of full day
+    return (hour / 24) * 100;
   };
 
   return (
@@ -70,25 +61,35 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
             </tr>
           </thead>
 
-          {/* Body */}
-          <tbody>
+          {/* Body with continuous timeline */}
+          <tbody className="relative">
+            {/* Continuous gradient timeline */}
+            <div className="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-slate-900 via-orange-400 via-yellow-300 via-blue-400 via-orange-500 to-slate-900 z-0" 
+                 style={{
+                   background: 'linear-gradient(to bottom, rgb(15 23 42), rgb(251 146 60), rgb(253 224 71), rgb(96 165 250), rgb(249 115 22), rgb(15 23 42))'
+                 }}>
+              {/* Timeline icons positioned absolutely */}
+              {hours.map((hour) => (
+                <div 
+                  key={`timeline-${hour}`}
+                  className="absolute w-6 h-6 -left-2 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden"
+                  style={{ top: `${getTimelinePosition(hour)}%` }}
+                >
+                  <img 
+                    src={getTimelineIcon(hour)} 
+                    alt={`${hour}:00`}
+                    className="w-4 h-4 object-cover rounded-full"
+                  />
+                </div>
+              ))}
+            </div>
+            
             {hours.map((hour) => (
               <tr key={hour} className="border-b border-schedule-border hover:bg-schedule-cell-hover/50">
                 <td className="sticky left-0 z-10 bg-schedule-header border-r border-schedule-border p-0 relative">
                   <div className="flex items-center h-12 sm:h-16">
-                    {/* Timeline gradient trim */}
-                    <div className={`w-2 h-full bg-gradient-to-b ${getTimelineGradient(hour)} relative`}>
-                      <div 
-                        className="absolute w-6 h-6 -left-2 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden"
-                        style={{ top: `${getTimelinePosition(hour)}%` }}
-                      >
-                        <img 
-                          src={getTimelineIcon(hour)} 
-                          alt={`${hour}:00`}
-                          className="w-4 h-4 object-cover rounded-full"
-                        />
-                      </div>
-                    </div>
+                    {/* Space for timeline */}
+                    <div className="w-2"></div>
                     
                     {/* Time text */}
                     <div className="flex-1 px-3 text-xs text-muted-foreground font-mono">
