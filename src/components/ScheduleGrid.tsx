@@ -41,13 +41,33 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
   };
 
   return (
-    <div className="bg-card rounded-xl border border-schedule-border shadow-card overflow-hidden">
+    <div className="bg-card rounded-xl border border-schedule-border shadow-card overflow-hidden relative">
+      {/* Continuous timeline gradient waterfall */}
+      <div className="absolute left-0 top-[48px] w-2 h-[calc(100%-48px)] bg-gradient-to-b from-slate-900 via-orange-400 via-yellow-300 via-blue-400 via-orange-500 to-slate-900 z-10">
+        {/* Timeline icons */}
+        <div className="absolute w-6 h-6 -left-2 top-0 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden">
+          <img src={midnightIcon} alt="Midnight" className="w-4 h-4 object-cover rounded-full" />
+        </div>
+        <div className="absolute w-6 h-6 -left-2 top-1/4 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden">
+          <img src={sunriseIcon} alt="Sunrise" className="w-4 h-4 object-cover rounded-full" />
+        </div>
+        <div className="absolute w-6 h-6 -left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden">
+          <img src={noonIcon} alt="Noon" className="w-4 h-4 object-cover rounded-full" />
+        </div>
+        <div className="absolute w-6 h-6 -left-2 top-3/4 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden">
+          <img src={sunsetIcon} alt="Sunset" className="w-4 h-4 object-cover rounded-full" />
+        </div>
+        <div className="absolute w-6 h-6 -left-2 bottom-0 transform translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden">
+          <img src={midnightIcon} alt="Midnight" className="w-4 h-4 object-cover rounded-full" />
+        </div>
+      </div>
+      
       <div className={`overflow-x-auto ${isRTL ? 'rtl' : ''}`}>
         <table className="w-full border-collapse">
           {/* Header */}
           <thead>
             <tr className="bg-schedule-header">
-              <th className="sticky left-0 z-10 bg-schedule-header border-r border-schedule-border p-3 text-sm font-medium text-muted-foreground">
+              <th className="sticky left-0 z-20 bg-schedule-header border-r border-schedule-border p-3 text-sm font-medium text-muted-foreground">
                 Time
               </th>
               {displayDays.map((dayIndex) => (
@@ -61,34 +81,13 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
             </tr>
           </thead>
 
-          {/* Body with continuous timeline */}
-          <tbody className="relative">
-            {/* Continuous gradient timeline */}
-            <div className="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-slate-900 via-orange-400 via-yellow-300 via-blue-400 via-orange-500 to-slate-900 z-0" 
-                 style={{
-                   background: 'linear-gradient(to bottom, rgb(15 23 42), rgb(251 146 60), rgb(253 224 71), rgb(96 165 250), rgb(249 115 22), rgb(15 23 42))'
-                 }}>
-              {/* Timeline icons positioned absolutely */}
-              {hours.map((hour) => (
-                <div 
-                  key={`timeline-${hour}`}
-                  className="absolute w-6 h-6 -left-2 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden"
-                  style={{ top: `${getTimelinePosition(hour)}%` }}
-                >
-                  <img 
-                    src={getTimelineIcon(hour)} 
-                    alt={`${hour}:00`}
-                    className="w-4 h-4 object-cover rounded-full"
-                  />
-                </div>
-              ))}
-            </div>
-            
+          {/* Body */}
+          <tbody>
             {hours.map((hour) => (
               <tr key={hour} className="border-b border-schedule-border hover:bg-schedule-cell-hover/50">
-                <td className="sticky left-0 z-10 bg-schedule-header border-r border-schedule-border p-0 relative">
+                <td className="sticky left-0 z-20 bg-schedule-header border-r border-schedule-border p-0 relative">
                   <div className="flex items-center h-12 sm:h-16">
-                    {/* Space for timeline */}
+                    {/* Space for timeline gradient */}
                     <div className="w-2"></div>
                     
                     {/* Time text */}
