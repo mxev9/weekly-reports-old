@@ -3,6 +3,10 @@ import { ScheduleCell } from './ScheduleCell';
 import { CellEditDialog } from './CellEditDialog';
 import { useScheduleStore } from '@/hooks/useScheduleStore';
 import { useTranslation } from '@/hooks/useTranslation';
+import midnightIcon from '@/assets/timeline-midnight.png';
+import sunriseIcon from '@/assets/timeline-sunrise.png';
+import noonIcon from '@/assets/timeline-noon.png';
+import sunsetIcon from '@/assets/timeline-sunset.png';
 
 interface ScheduleGridProps {
   viewMode: 'week' | 'day';
@@ -24,12 +28,19 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
   };
 
   const getTimelineIcon = (hour: number) => {
-    if (hour === 0) return '🌙';
-    if (hour >= 6 && hour < 12) return '🌅';
-    if (hour === 12) return '☀️';
-    if (hour > 12 && hour < 18) return '🌞';
-    if (hour >= 18 && hour < 24) return '🌙';
-    return '🌙';
+    if (hour >= 0 && hour < 6) return midnightIcon;
+    if (hour >= 6 && hour < 12) return sunriseIcon;
+    if (hour >= 12 && hour < 18) return noonIcon;
+    if (hour >= 18 && hour < 24) return sunsetIcon;
+    return midnightIcon;
+  };
+
+  const getTimelineGradient = (hour: number) => {
+    if (hour >= 0 && hour < 6) return 'from-slate-900 via-blue-900 to-slate-900'; // Night
+    if (hour >= 6 && hour < 12) return 'from-orange-400 via-pink-400 to-yellow-300'; // Sunrise
+    if (hour >= 12 && hour < 18) return 'from-blue-400 via-cyan-300 to-blue-500'; // Day
+    if (hour >= 18 && hour < 24) return 'from-purple-600 via-orange-500 to-red-400'; // Sunset
+    return 'from-slate-900 via-blue-900 to-slate-900';
   };
 
   const getTimelinePosition = (hour: number) => {
@@ -66,17 +77,21 @@ export function ScheduleGrid({ viewMode, selectedDay }: ScheduleGridProps) {
                 <td className="sticky left-0 z-10 bg-schedule-header border-r border-schedule-border p-0 relative">
                   <div className="flex items-center h-12 sm:h-16">
                     {/* Timeline gradient trim */}
-                    <div className="w-1 h-full bg-gradient-to-b from-primary/20 via-primary to-primary/20 relative">
+                    <div className={`w-2 h-full bg-gradient-to-b ${getTimelineGradient(hour)} relative`}>
                       <div 
-                        className="absolute w-3 h-3 -left-1 transform -translate-y-1/2 bg-primary rounded-full flex items-center justify-center text-xs"
+                        className="absolute w-6 h-6 -left-2 transform -translate-y-1/2 bg-white rounded-full flex items-center justify-center shadow-md overflow-hidden"
                         style={{ top: `${getTimelinePosition(hour)}%` }}
                       >
-                        <span className="text-xs">{getTimelineIcon(hour)}</span>
+                        <img 
+                          src={getTimelineIcon(hour)} 
+                          alt={`${hour}:00`}
+                          className="w-4 h-4 object-cover rounded-full"
+                        />
                       </div>
                     </div>
                     
                     {/* Time text */}
-                    <div className="flex-1 px-2 text-xs text-muted-foreground font-mono">
+                    <div className="flex-1 px-3 text-xs text-muted-foreground font-mono">
                       {formatHour(hour)}
                     </div>
                   </div>
