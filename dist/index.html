@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أسبوعي</title>
+    <meta name="description" content="نظام تتبع أنشطتي الأسبوعية" />
+    <meta name="author" content="Sulaiman" />
+
+    <!-- Open Graph / Social preview -->
+    <meta property="og:title" content="أسبوعي" />
+    <meta property="og:description" content="نظام تتبع أنشطتي الأسبوعية" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- Twitter Meta -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@your_handle" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- PWA Essentials -->
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./app-icon-512.png" />
+    <meta name="theme-color" content="#131312" />
+    <script type="module" crossorigin src="./assets/index-C9XhpcSR.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CIdIj5ui.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- SPA Redirect for GitHub Pages (safe to leave even لو مو مستخدم) -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+
+    <!-- Vite Entrypoint -->
+
+    <!-- ✅ Register Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(() => console.log("✅ Service Worker Registered"))
+          .catch(err => console.error("Service Worker Error:", err));
+      }
+    </script>
+
+  </body>
+</html>
