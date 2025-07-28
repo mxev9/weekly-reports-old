@@ -12,6 +12,16 @@ export function ScheduleCell({ day, hour, cell, onClick }: ScheduleCellProps) {
   const { tags } = useScheduleStore();
 
   const cellTags = cell.tags.map(tagId => tags.find(tag => tag.id === tagId)).filter(Boolean);
+  
+  // Debug logging
+  console.log('ScheduleCell Debug:', {
+    day,
+    hour,
+    cellTagIds: cell.tags,
+    availableTags: tags,
+    cellTags,
+    satisfaction: cell.satisfaction
+  });
 
   const getTagColorClass = (color: string) => {
     const colorMap = {
