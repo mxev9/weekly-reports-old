@@ -36,7 +36,8 @@ export function ScheduleCell({ day, hour, cell, onClick }: ScheduleCellProps) {
           {cellTags.slice(0, 2).map((tag) => (
             <span
               key={tag!.id}
-              className={`inline-block px-1.5 py-0.5 rounded text-white text-xs font-medium ${getTagColorClass(tag!.color)}`}
+              className={`inline-block px-1.5 py-0.5 rounded text-white text-xs font-medium`}
+              style={{ backgroundColor: `hsl(var(--tag-${tag!.color}))` }}
               title={tag!.name}
             >
               {tag!.name.slice(0, 6)}
