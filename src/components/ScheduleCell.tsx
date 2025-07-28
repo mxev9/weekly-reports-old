@@ -13,15 +13,17 @@ export function ScheduleCell({ day, hour, cell, onClick }: ScheduleCellProps) {
 
   const cellTags = cell.tags.map(tagId => tags.find(tag => tag.id === tagId)).filter(Boolean);
   
-  // Debug logging
-  console.log('ScheduleCell Debug:', {
-    day,
-    hour,
-    cellTagIds: cell.tags,
-    availableTags: tags,
-    cellTags,
-    satisfaction: cell.satisfaction
-  });
+  // Debug logging - always show for cells with tags or satisfaction
+  if (cell.tags.length > 0 || cell.satisfaction) {
+    console.log('ScheduleCell Debug:', {
+      day,
+      hour,
+      cellTagIds: cell.tags,
+      availableTags: tags,
+      cellTags,
+      satisfaction: cell.satisfaction
+    });
+  }
 
   const getTagColorClass = (color: string) => {
     const colorMap = {

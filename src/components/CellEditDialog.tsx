@@ -37,6 +37,13 @@ export function CellEditDialog({ day, hour, cell, onClose }: CellEditDialogProps
   };
 
   const handleSave = () => {
+    console.log('CellEditDialog Save:', {
+      day,
+      hour,
+      selectedTags,
+      satisfaction,
+      cellBefore: cell
+    });
     updateCell(day, hour, {
       tags: selectedTags,
       satisfaction,
