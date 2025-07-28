@@ -24,17 +24,27 @@ export function useScheduleStore() {
     );
   });
 
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<Tag[]>(() => {
+    // Load tags from localStorage on initialization
+    try {
+      const savedTags = localStorage.getItem(TAGS_STORAGE_KEY);
+      return savedTags ? JSON.parse(savedTags) : [];
+    } catch (error) {
+      console.error('Failed to load tags:', error);
+      return [];
+    }
+  });
 
   const loadSchedule = useCallback(() => {
     try {
       const savedSchedule = localStorage.getItem(STORAGE_KEY);
-      const savedTags = localStorage.getItem(TAGS_STORAGE_KEY);
       
       if (savedSchedule) {
         setSchedule(JSON.parse(savedSchedule));
       }
       
+      // Load tags separately to ensure they're always available
+      const savedTags = localStorage.getItem(TAGS_STORAGE_KEY);
       if (savedTags) {
         setTags(JSON.parse(savedTags));
       }
