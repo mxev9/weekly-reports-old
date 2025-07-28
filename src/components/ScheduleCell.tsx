@@ -53,10 +53,10 @@ export function ScheduleCell({ day, hour, cell, onClick }: ScheduleCellProps) {
         {/* Satisfaction indicator */}
         <div className="flex justify-end">
           {cell.satisfaction === 'check' && (
-            <Check className="h-3 w-3 text-primary" />
+            <Check className="h-3 w-3 text-green-500 fill-current" />
           )}
           {cell.satisfaction === 'star' && (
-            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+            <Star className="h-3 w-3 text-yellow-400 fill-current" />
           )}
         </div>
       </div>
