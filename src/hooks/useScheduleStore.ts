@@ -17,6 +17,7 @@ const STORAGE_KEY = 'weekly-schedule-data';
 const TAGS_STORAGE_KEY = 'weekly-schedule-tags';
 
 export function useScheduleStore() {
+  const [version, setVersion] = useState(0);
   const [schedule, setSchedule] = useState<Schedule>(() => {
     // Try to load from localStorage first
     try {
@@ -74,7 +75,7 @@ export function useScheduleStore() {
   }, []);
 
   const updateCell = useCallback((day: number, hour: number, updates: Partial<ScheduleCell>) => {
-    console.log('updateCell called:', { day, hour, updates });
+    console.log('updateCell called:', { day, hour, updates, currentVersion: version });
     
     const newSchedule = schedule.map((daySchedule, dayIndex) =>
       dayIndex === day
@@ -87,10 +88,12 @@ export function useScheduleStore() {
     console.log('Current schedule before update:', schedule[day][hour]);
     console.log('New schedule after update:', newSchedule[day][hour]);
     
+    // Force re-render by updating version
+    setVersion(prev => prev + 1);
     // Update state and localStorage
     setSchedule(newSchedule);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
-  }, [schedule]);
+  }, [schedule, version]);
 
   const addTag = useCallback((name: string, color: Tag['color']) => {
     const newTag: Tag = {
@@ -126,6 +129,7 @@ export function useScheduleStore() {
   return {
     schedule,
     tags,
+    version,
     loadSchedule,
     updateCell,
     addTag,
