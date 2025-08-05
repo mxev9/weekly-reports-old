@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useReducer } from 'react';
 
 export interface Tag {
   id: string;
@@ -13,26 +13,64 @@ export interface ScheduleCell {
 
 export type Schedule = ScheduleCell[][]; // [day][hour]
 
+interface ScheduleState {
+  schedule: Schedule;
+  version: number;
+}
+
+type ScheduleAction = 
+  | { type: 'UPDATE_CELL'; day: number; hour: number; updates: Partial<ScheduleCell> }
+  | { type: 'LOAD_SCHEDULE'; schedule: Schedule }
+  | { type: 'RESET_SCHEDULE' };
+
+const scheduleReducer = (state: ScheduleState, action: ScheduleAction): ScheduleState => {
+  switch (action.type) {
+    case 'UPDATE_CELL':
+      const newSchedule = state.schedule.map((daySchedule, dayIndex) =>
+        dayIndex === action.day
+          ? daySchedule.map((cell, hourIndex) =>
+              hourIndex === action.hour ? { ...cell, ...action.updates } : cell
+            )
+          : daySchedule
+      );
+      return { schedule: newSchedule, version: state.version + 1 };
+    
+    case 'LOAD_SCHEDULE':
+      return { schedule: action.schedule, version: state.version + 1 };
+    
+    case 'RESET_SCHEDULE':
+      const emptySchedule = Array(7).fill(null).map(() => 
+        Array(24).fill(null).map(() => ({ tags: [] }))
+      );
+      return { schedule: emptySchedule, version: state.version + 1 };
+    
+    default:
+      return state;
+  }
+};
+
 const STORAGE_KEY = 'weekly-schedule-data';
 const TAGS_STORAGE_KEY = 'weekly-schedule-tags';
 
 export function useScheduleStore() {
-  const [version, setVersion] = useState(0);
-  const [schedule, setSchedule] = useState<Schedule>(() => {
-    // Try to load from localStorage first
-    try {
-      const savedSchedule = localStorage.getItem(STORAGE_KEY);
-      if (savedSchedule) {
-        return JSON.parse(savedSchedule);
+  const [state, dispatch] = useReducer(scheduleReducer, {
+    schedule: (() => {
+      // Try to load from localStorage first
+      try {
+        const savedSchedule = localStorage.getItem(STORAGE_KEY);
+        if (savedSchedule) {
+          return JSON.parse(savedSchedule);
+        }
+      } catch (error) {
+        console.error('Failed to load initial schedule:', error);
       }
-    } catch (error) {
-      console.error('Failed to load initial schedule:', error);
-    }
-    
-    // Initialize empty 7x24 grid if no saved data
-    return Array(7).fill(null).map(() => 
-      Array(24).fill(null).map(() => ({ tags: [] }))
-    );
+      
+      // Initialize empty 7x24 grid if no saved data
+      return Array(7).fill(null).map(() => 
+        Array(24).fill(null).map(() => ({ tags: [] }))
+      );
+    })(),
+    version: 0,
   });
 
   const [tags, setTags] = useState<Tag[]>(() => {
@@ -51,7 +89,7 @@ export function useScheduleStore() {
       const savedSchedule = localStorage.getItem(STORAGE_KEY);
       
       if (savedSchedule) {
-        setSchedule(JSON.parse(savedSchedule));
+        dispatch({ type: 'LOAD_SCHEDULE', schedule: JSON.parse(savedSchedule) });
       }
       
       // Load tags separately to ensure they're always available
@@ -64,36 +102,26 @@ export function useScheduleStore() {
     }
   }, []);
 
-  const saveSchedule = useCallback((newSchedule: Schedule) => {
-    setSchedule(newSchedule);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
-  }, []);
-
   const saveTags = useCallback((newTags: Tag[]) => {
     setTags(newTags);
     localStorage.setItem(TAGS_STORAGE_KEY, JSON.stringify(newTags));
   }, []);
 
   const updateCell = useCallback((day: number, hour: number, updates: Partial<ScheduleCell>) => {
-    console.log('updateCell called:', { day, hour, updates, currentVersion: version });
+    console.log('updateCell called with reducer:', { day, hour, updates, currentVersion: state.version });
     
-    const newSchedule = schedule.map((daySchedule, dayIndex) =>
+    dispatch({ type: 'UPDATE_CELL', day, hour, updates });
+    
+    // Save to localStorage after state update
+    const newSchedule = state.schedule.map((daySchedule, dayIndex) =>
       dayIndex === day
         ? daySchedule.map((cell, hourIndex) =>
             hourIndex === hour ? { ...cell, ...updates } : cell
           )
         : daySchedule
     );
-    
-    console.log('Current schedule before update:', schedule[day][hour]);
-    console.log('New schedule after update:', newSchedule[day][hour]);
-    
-    // Force re-render by updating version
-    setVersion(prev => prev + 1);
-    // Update state and localStorage
-    setSchedule(newSchedule);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
-  }, [schedule, version]);
+  }, [state.schedule, state.version]);
 
   const addTag = useCallback((name: string, color: Tag['color']) => {
     const newTag: Tag = {
@@ -110,26 +138,28 @@ export function useScheduleStore() {
     saveTags(newTags);
 
     // Remove the tag from all schedule cells
-    const newSchedule = schedule.map(daySchedule =>
+    const newSchedule = state.schedule.map(daySchedule =>
       daySchedule.map(cell => ({
         ...cell,
         tags: cell.tags.filter(id => id !== tagId),
       }))
     );
-    saveSchedule(newSchedule);
-  }, [tags, schedule, saveTags, saveSchedule]);
+    dispatch({ type: 'LOAD_SCHEDULE', schedule: newSchedule });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
+  }, [tags, state.schedule, saveTags]);
 
   const resetSchedule = useCallback(() => {
+    dispatch({ type: 'RESET_SCHEDULE' });
     const emptySchedule = Array(7).fill(null).map(() => 
       Array(24).fill(null).map(() => ({ tags: [] }))
     );
-    saveSchedule(emptySchedule);
-  }, [saveSchedule]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(emptySchedule));
+  }, []);
 
   return {
-    schedule,
+    schedule: state.schedule,
     tags,
-    version,
+    version: state.version,
     loadSchedule,
     updateCell,
     addTag,
