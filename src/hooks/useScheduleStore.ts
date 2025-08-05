@@ -75,22 +75,22 @@ export function useScheduleStore() {
 
   const updateCell = useCallback((day: number, hour: number, updates: Partial<ScheduleCell>) => {
     console.log('updateCell called:', { day, hour, updates });
-    setSchedule(currentSchedule => {
-      console.log('Current schedule before update:', currentSchedule[day][hour]);
-      const newSchedule = currentSchedule.map((daySchedule, dayIndex) =>
-        dayIndex === day
-          ? daySchedule.map((cell, hourIndex) =>
-              hourIndex === hour ? { ...cell, ...updates } : cell
-            )
-          : daySchedule
-      );
-      
-      console.log('New schedule after update:', newSchedule[day][hour]);
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
-      return newSchedule;
-    });
-  }, []);
+    
+    const newSchedule = schedule.map((daySchedule, dayIndex) =>
+      dayIndex === day
+        ? daySchedule.map((cell, hourIndex) =>
+            hourIndex === hour ? { ...cell, ...updates } : cell
+          )
+        : daySchedule
+    );
+    
+    console.log('Current schedule before update:', schedule[day][hour]);
+    console.log('New schedule after update:', newSchedule[day][hour]);
+    
+    // Update state and localStorage
+    setSchedule(newSchedule);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
+  }, [schedule]);
 
   const addTag = useCallback((name: string, color: Tag['color']) => {
     const newTag: Tag = {
