@@ -74,15 +74,20 @@ export function useScheduleStore() {
   }, []);
 
   const updateCell = useCallback((day: number, hour: number, updates: Partial<ScheduleCell>) => {
-    const newSchedule = schedule.map((daySchedule, dayIndex) =>
-      dayIndex === day
-        ? daySchedule.map((cell, hourIndex) =>
-            hourIndex === hour ? { ...cell, ...updates } : cell
-          )
-        : daySchedule
-    );
-    saveSchedule(newSchedule);
-  }, [schedule, saveSchedule]);
+    setSchedule(currentSchedule => {
+      const newSchedule = currentSchedule.map((daySchedule, dayIndex) =>
+        dayIndex === day
+          ? daySchedule.map((cell, hourIndex) =>
+              hourIndex === hour ? { ...cell, ...updates } : cell
+            )
+          : daySchedule
+      );
+      
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newSchedule));
+      return newSchedule;
+    });
+  }, []);
 
   const addTag = useCallback((name: string, color: Tag['color']) => {
     const newTag: Tag = {
