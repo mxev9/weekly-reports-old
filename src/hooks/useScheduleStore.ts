@@ -18,7 +18,17 @@ const TAGS_STORAGE_KEY = 'weekly-schedule-tags';
 
 export function useScheduleStore() {
   const [schedule, setSchedule] = useState<Schedule>(() => {
-    // Initialize empty 7x24 grid
+    // Try to load from localStorage first
+    try {
+      const savedSchedule = localStorage.getItem(STORAGE_KEY);
+      if (savedSchedule) {
+        return JSON.parse(savedSchedule);
+      }
+    } catch (error) {
+      console.error('Failed to load initial schedule:', error);
+    }
+    
+    // Initialize empty 7x24 grid if no saved data
     return Array(7).fill(null).map(() => 
       Array(24).fill(null).map(() => ({ tags: [] }))
     );
